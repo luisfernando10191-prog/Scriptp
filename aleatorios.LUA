@@ -29,10 +29,10 @@ atack1:move(90,300)
 macro(200,function()
   local t=g_game.getAttackingCreature()
   if t and t:getName():lower()~="trainer" and g_game.isAttacking() then
-    say("ultimate bijuu dama")
+    say("")
     say("tsukuyomi infinito")
-    say("aoi boru")
-    say("amenomihashira")
+    say("")
+    say("")
   end
 end)
 
