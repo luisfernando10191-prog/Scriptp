@@ -31,8 +31,8 @@ macro(200,function()
   if t and t:getName():lower()~="trainer" and g_game.isAttacking() then
     say("")
     say("tsukuyomi infinito")
-    say("")
-    say("")
+    say("katon bakuhatsu")
+    say("cho kogeki keiro")
   end
 end)
 
