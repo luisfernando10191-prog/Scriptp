@@ -886,7 +886,7 @@ macro(200, function()
         local targetName = target:getName():lower()  
         if targetName ~= "trainer" and g_game.isAttacking() then  
             say('')  
-            say('tsukiyomi infinito')  
+            say('tsukuyomi infinito')  
             say('katon bakuhatsu')  
             say('cho kogeki keiro')  
         end  
