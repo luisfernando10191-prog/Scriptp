@@ -886,9 +886,9 @@ macro(200, function()
         local targetName = target:getName():lower()  
         if targetName ~= "trainer" and g_game.isAttacking() then  
             say('ultimate bijuu dama')  
-            say('kaze supairaru')  
-            say('aoi boru')  
-            say('amenomihashira')  
+            say('tsukiyomi infinito')  
+            say('katon bakuhatsu')  
+            say('cho kogeki keiro')  
         end  
     end  
 end)
