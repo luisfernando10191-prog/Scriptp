@@ -1,9 +1,9 @@
--- dungeonsOFUS.lua (ofuscado leve)
+-- AutoDungeonOFUS.lua (ofuscado leve)
 
+-- ================= UI Setup ==================
 local a={"Mudoku","Special Anko","Solo Black Wolf","Black Lobisomem","Special Chisana","Dungeon Farukon","Dungeon Kakuzu","Solo Lobisomem","Special Haku","Dungeon Shita","Elite Black Dragon","Madara Rikudou","Special Minato","Special Itachi","Special Obito","Special Hagoromo","Naruto Barion","Majo Tsuyoi"}
-local b={}
-
-local c=setupUI([[Panel
+local b=setupUI([[
+Panel
   id: dungeonSetupPanel
   height: 30
   width: 160
@@ -30,81 +30,150 @@ local c=setupUI([[Panel
     height: 0
     visible: false
 ]])
-local d=false
-
-c.toggleButton.onClick=function()
-  local w=c.checkboxPanel
-  local v=not w:isVisible()
-  if v and not d then
+local c=false
+b.toggleButton.onClick=function()
+  local p=b.checkboxPanel
+  local s=not p:isVisible()
+  if s and not c then
     for _,n in ipairs(a) do
       local id=n:gsub("%s+","")
-      local cb=g_ui.createWidget("CheckBox",w)
+      local cb=g_ui.createWidget("CheckBox",p)
       cb:setId(id)
       cb:setText(n)
       cb:setWidth(140)
       cb:setChecked(storage["dungeon_"..n] or false)
-      cb.onCheckChange=function(_,val) storage["dungeon_"..n]=val end
+      cb.onCheckChange=function(w,v) storage["dungeon_"..n]=v end
     end
-    d=true
+    c=true
   end
-  w:setVisible(v)
-  if v then w:setHeight(#a*20) c:setHeight(#a*20+40) else w:setHeight(0) c:setHeight(30) end
+  p:setVisible(s)
+  if s then
+    p:setHeight(#a*20)
+    b:setHeight(#a*20+40)
+  else
+    p:setHeight(0)
+    b:setHeight(30)
+  end
 end
 
-local e={
-{name="Mudoku",label="startMudoku",endLabel="endMudoku"},
-{name="Special Anko",label="startAnko",endLabel="endAnko"},
-{name="Solo Black Wolf",label="startSoloWolf",endLabel="endSoloWolf"},
-{name="Black Lobisomem",label="startBlackLobisomem",endLabel="endBlackLobisomem"},
-{name="Special Chisana",label="startChisana",endLabel="endChisana"},
-{name="Dungeon Farukon",label="startDungeonFarukon",endLabel="endDungeonFarukon"},
-{name="Solo Lobisomem",label="startSoloLobisomem",endLabel="endLobisomem"},
-{name="Special Haku",label="startSpecialHaku",endLabel="endSpecialHaku"},
-{name="Dungeon Shita",label="startDungeonShita",endLabel="endDungeonShita"},
-{name="Elite Black Dragon",label="startEliteBlackDragon",endLabel="endEliteBlackDragon"},
-{name="Madara Rikudou",label="startMadaraRikudou",endLabel="endMadaraRikudou"},
-{name="Special Minato",label="startSpecialMinato",endLabel="endSpecialMinato"},
-{name="Special Itachi",label="startItachi",endLabel="endItachi"},
-{name="Special Obito",label="startSpecialObito",endLabel="endSpecialObito"},
-{name="Special Hagoromo",label="startHagoromo",endLabel="endHagoromo"},
-{name="Majo Tsuyoi",label="startMajoTsuyoi",endLabel="endMajoTsuyoi"},
-{name="Dungeon Kakuzu",label="startKakuzu",endLabel="endKakuzu"},
-{name="Naruto Barion",label="startNarutoBarion",endLabel="endNarutoBarion"}
+-- ================= Lógica Dungeons ==================
+local d={
+  {n="Mudoku",l="startMudoku",e="endMudoku"},
+  {n="Special Anko",l="startAnko",e="endAnko"},
+  {n="Solo Black Wolf",l="startSoloWolf",e="endSoloWolf"},
+  {n="Black Lobisomem",l="startBlackLobisomem",e="endBlackLobisomem"},
+  {n="Special Chisana",l="startChisana",e="endChisana"},
+  {n="Dungeon Farukon",l="startDungeonFarukon",e="endDungeonFarukon"},
+  {n="Solo Lobisomem",l="startSoloLobisomem",e="endLobisomem"},
+  {n="Special Haku",l="startSpecialHaku",e="endSpecialHaku"},
+  {n="Dungeon Shita",l="startDungeonShita",e="endDungeonShita"},
+  {n="Elite Black Dragon",l="startEliteBlackDragon",e="endEliteBlackDragon"},
+  {n="Madara Rikudou",l="startMadaraRikudou",e="endMadaraRikudou"},
+  {n="Special Minato",l="startSpecialMinato",e="endSpecialMinato"},
+  {n="Special Itachi",l="startItachi",e="endItachi"},
+  {n="Special Obito",l="startSpecialObito",e="endSpecialObito"},
+  {n="Special Hagoromo",l="startHagoromo",e="endHagoromo"},
+  {n="Majo Tsuyoi",l="startMajoTsuyoi",e="endMajoTsuyoi"},
+  {n="Dungeon Kakuzu",l="startKakuzu",e="endKakuzu"},
+  {n="Naruto Barion",l="startNarutoBarion",e="endNarutoBarion"}
 }
-
-local f={"Mudoku","Special Anko","Special Itachi","Black Lobisomem","Special Chisana","Elite Black Dragon","Special Haku","Dungeon Fuuton Heart","Solo Black Wolf","Solo Lobisomem","Madara Rikudou","Special Minato","Special Obito","Majo Tsuyoi","Dungeon Shita","Dungeon Farukon","Naruto Barion","Special Hagoromo"}
-local g=30000
-local h=15000
+local e={"Mudoku","Special Anko","Special Itachi","Black Lobisomem","Special Chisana","Elite Black Dragon","Special Haku","Dungeon Fuuton Heart","Solo Black Wolf","Solo Lobisomem","Madara Rikudou","Special Minato","Special Obito","Majo Tsuyoi","Dungeon Shita","Dungeon Farukon","Naruto Barion","Special Hagoromo"}
+local f=30000
+local g=15000
+local h=nil
 local i=nil
-local j=nil
-local k=1
+local j=1
 
-macro(g,"Auto Dungeon",function()
+-- ================= Controle Treino ==================
+local k={{x=1449,y=1228,z=8},{x=1449,y=1230,z=8},{x=1449,y=1232,z=8},{x=1449,y=1234,z=8},{x=1449,y=1236,z=8},{x=1449,y=1238,z=8}}
+local l=nil
+local m=false
+local function n(p)
+  for _,q in ipairs(k) do
+    if p.x==q.x and p.y==q.y and p.z==q.z then return true end
+  end
+  return false
+end
+
+-- Detecta boss com vida baixa
+macro(500,function()
+  for _,v in pairs(getSpectators()) do
+    if v:isMonster() then
+      local nn=v:getName():lower()
+      for _,bname in ipairs(e) do
+        if nn:find(bname:lower()) and v:getHealthPercent()<=95 then
+          CaveBot.setOn(false)
+          h=nil
+          i=nil
+          return
+        end
+      end
+    end
+  end
+end)
+
+-- Desliga ao entrar/sair do treino
+macro(200,function()
+  local p=pos()
+  if not p then return end
+  local t=n(p)
+  if l==nil then l=t return end
+  if not l and t then CaveBot.setOn(false)
+  elseif l and not t then
+    if m then m=false else CaveBot.setOn(false) end
+  end
+  l=t
+end)
+
+-- Macro principal das dungeons
+macro(f,"Auto Dungeon",function()
   local now=os.clock()*1000
-  if i and j and now-j>h then CaveBot.gotoLabel(i.label) j=now return end
-  if i then return end
+  if h and i and (now-i>g) then
+    CaveBot.gotoLabel(h.l)
+    i=now
+    return
+  end
+  if h then return end
   local attempts=0
-  while attempts<#e do
-    local dng=e[k]
-    local enabled=storage["dungeon_"..dng.name] or false
+  while attempts<#d do
+    local dungeon=d[j]
+    local enabled=storage["dungeon_"..dungeon.n] or false
     if enabled then
-      local ok=false
-      for _,child in pairs(g_ui.getRootWidget():recursiveGetChildren()) do
-        if type(child.getText)=="function" and child:isVisible() then
-          local t=child:getText()
-          if t and t:find(dng.name) then
-            local p=child:getParent()
-            if p then
-              for _,c in pairs(p:getChildren()) do
-                if type(c.getText)=="function" and c:isVisible() and c:getText()=="OK" then ok=true break end
+      local avail=false
+      for _,w in pairs(g_ui.getRootWidget():recursiveGetChildren()) do
+        if type(w.getText)=="function" and w:isVisible() then
+          local txt=w:getText()
+          if txt and txt:find(dungeon.n) then
+            local parent=w:getParent()
+            if parent then
+              for _,label in pairs(parent:getChildren()) do
+                if type(label.getText)=="function" and label:isVisible() and label:getText()=="OK" then
+                  avail=true
+                  break
+                end
               end
             end
           end
         end
-        if ok then break end
+        if avail then break end
       end
-      if ok then CaveBot.setOn(true) i=dng j=now return end
+      if avail then
+        local pos_=pos()
+        if pos_ and n(pos_) then m=true end
+        CaveBot.setOn(true)
+        CaveBot.gotoLabel(dungeon.l)
+        h=dungeon
+        i=now
+        return
+      end
     end
-    k=k+1 if k>#e then k=1 end attempts=attempts+1
+    j=j+1
+    if j>#d then j=1 end
+    attempts=attempts+1
+  end
+  local pos_=pos()
+  if pos_ and not n(pos_) then
+    CaveBot.setOn(true)
+    CaveBot.gotoLabel("startTreino")
   end
 end)
