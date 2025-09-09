@@ -982,17 +982,52 @@ end)
 
 
 
---Combo
-macro(200, function()
-    local target = g_game.getAttackingCreature()  -- pega a criatura que você está atacando
+
+
+local _combo = {
+    spellCount = 5, -- quantidade de magias
+}
+storage.uCombo = storage.uCombo or {}
+
+_combo.logic = function()
+    local target = g_game.getAttackingCreature()
     if target then
         local targetName = target:getName():lower()
-        if targetName ~= "trainer" and g_game.isAttacking() then
-            say('Raiton hankei')
-            say('ultimate bijuu dama')
-            say('Katon burning')
-            say('Yona kaze')
-            say('Big raiton')
+        if targetName ~= "trainer" then
+            for index, spell in ipairs(storage.uCombo) do
+                if spell and spell ~= "" then
+                    say(spell)
+                end
+            end
         end
     end
-end)
+end
+
+_combo.macro = macro(100, "Combo", _combo.logic)
+
+for i = 1, _combo.spellCount do
+    addTextEdit("id"..i, storage.uCombo[i] or "", function(self, text)
+        storage.uCombo[i] = text
+    end)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
