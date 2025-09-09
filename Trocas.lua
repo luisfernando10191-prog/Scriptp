@@ -3,7 +3,7 @@
 local danzoID = 13956      
 local mamoruID = 12395 -- Super Mamoru      
 local izanagiRingID = 11196      
-local susanooRingID = 14944      
+local susanooRingID = 14327      
       
 -- CONFIGURAÇÃO DE COOLDOWNS      
 local danzoCD = 5 * 60 * 1000      
