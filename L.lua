@@ -788,7 +788,7 @@ local allowedMonsters = {
 
 local distance = 10
 
-atackMacro = macro(1, "orher", function()
+atackMacro = macro(1, function()
   if isInPz() then
     return
   end
