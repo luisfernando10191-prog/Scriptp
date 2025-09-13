@@ -1,4 +1,5 @@
--- ================= UI Setup ==================    
+-- ================= UI Setup ================== 
+setDefaultTab('dgs')
 
 local dungeonOptions = {    
   "Mudoku", "Special Anko", "Solo Black Wolf", "Black Lobisomem",    
