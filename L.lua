@@ -1,5 +1,3 @@
-
-
 -- ================= UI Setup ==================    
 
 local dungeonOptions = {    
@@ -12,22 +10,22 @@ local dungeonOptions = {
 local dungeonSetupPanel = setupUI([[    
 Panel    
   id: dungeonSetupPanel    
-  height: 30    
-  width: 160    
+  height: 15
+  width: 140
   margin: 5    
-  padding: 3    
-  background-color: #1e1e1ecc    
+  padding: 3   
   anchors.top: parent.top    
   anchors.left: parent.left    
   draggable: true    
 
-  Button    
-    id: toggleButton    
-    text: Setup    
-    width: 60    
-    height: 20    
-    anchors.left: parent.left    
-    anchors.top: parent.top    
+  Button      
+    id: toggleButton      
+    text: Dungeons
+    color: blue  
+    width: 60  
+    height: 20      
+    anchors.left: parent.left      
+    anchors.top: parent.top
 
   Panel    
     id: checkboxPanel    
@@ -72,6 +70,20 @@ dungeonSetupPanel.toggleButton.onClick = function()
   end    
 end    
 
+-- ========================
+-- Efeito RGB no botão Dgs
+-- ========================
+local btn = dungeonSetupPanel.toggleButton
+macro(1000, function()
+  if not btn then return end
+  btn:setColor("pink")
+  schedule(200, function() if btn then btn:setColor("red") end end)
+  schedule(400, function() if btn then btn:setColor("yellow") end end)
+  schedule(600, function() if btn then btn:setColor("orange") end end)
+  schedule(800, function() if btn then btn:setColor("#00FFFF") end end)
+  schedule(1000, function() if btn then btn:setColor("green") end end)
+  schedule(1200, function() if btn then btn:setColor("blue") end end)
+end)
 
 
 -- ================ Lógica das Dungeons ================    
