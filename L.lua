@@ -544,25 +544,53 @@ if player:getBlessings() == 0 then
 end
 
 
---Trocar armas
 
--- Função que tenta equipar até funcionar (máx 20 tentativas para segurança)
-function equiparAteFuncionar(itemId, slot)
-  local tentativas = 0
-  local function tentar()
-    local itemAtual = g_game.getLocalPlayer():getInventoryItem(slot)
-    if itemAtual and itemAtual:getId() == itemId then return end
-    if tentativas >= 20 then return end
-    moveToSlot(itemId, slot)
-    tentativas = tentativas + 1
-    schedule(500, tentar)
-  end
-  tentar()
-end
+-- ==================== CONFIGURAÇÃO ====================
+
+-- Campo de texto para editar IDs das armas
+-- Formato:
+-- PvP: distancia,corpoacorpo
+-- Boss: principal,secundaria
+-- Trainer: id
+storage.weaponIDsText = storage.weaponIDsText or "PvP:13614,14253\nBoss:13614,14579\nTrainer:14413"
 
 -- Modos disponíveis
 local modos = {"PvP", "Boss"}
 storage.weaponModeIndex = storage.weaponModeIndex or 1
+
+-- ==================== FUNÇÕES ====================
+
+-- Equipar arma até funcionar (máx 20 tentativas)
+function equiparAteFuncionar(itemId, slot)
+    local tentativas = 0
+    local function tentar()
+        local itemAtual = g_game.getLocalPlayer():getInventoryItem(slot)
+        if itemAtual and itemAtual:getId() == itemId then return end
+        if tentativas >= 20 then return end
+        moveToSlot(itemId, slot)
+        tentativas = tentativas + 1
+        schedule(500, tentar)
+    end
+    tentar()
+end
+
+-- Função para parsear IDs do texto
+local function parseWeaponIDs()
+    local ids = {}
+    for line in storage.weaponIDsText:gmatch("[^\n]+") do
+        local mode, list = line:match("(%w+):(.+)")
+        if mode and list then
+            local values = {}
+            for id in list:gmatch("%d+") do
+                table.insert(values, tonumber(id))
+            end
+            ids[mode] = values
+        end
+    end
+    return ids
+end
+
+-- ==================== UI ====================
 
 local modoLabel = UI.Label("Modo: " .. modos[storage.weaponModeIndex])
 
@@ -574,10 +602,18 @@ local changeModeButton = UI.Button("Trocar Modo", function()
     modoLabel:setText("Modo: " .. modos[storage.weaponModeIndex])
 end)
 
--- Controle de tempo e estado
+-- Campo de texto para configurar os IDs das armas
+addTextEdit("Config Armas (Modo:ID1,ID2)", storage.weaponIDsText, function(widget, text)
+    storage.weaponIDsText = text
+end)
+
+-- ==================== CONTROLE DE TEMPO ====================
+
 local lastSwitchTime = 0
 local isUsingSecondary = false
 local lastAttackTime = 0
+
+-- ==================== MACRO TROCAR ARMA ====================
 
 local trocarArmaMacro = macro(100, "Trocar Arma", function()
     if not g_game.isAttacking() then return end
@@ -590,27 +626,33 @@ local trocarArmaMacro = macro(100, "Trocar Arma", function()
     local currentWeapon = checkID and checkID:getId() or 0
     local distance = getDistanceBetween(pos(), target:getPosition())
 
-    -- ========== PRIORIDADE: TRAINER ==========
-    if target:getName():lower() == "trainer" then
-        if currentWeapon ~= 14413 then
-            equiparAteFuncionar(14413, SlotLeft)
-        end
-        return -- não executa os outros modos
-    end
-
-    -- ========== MODOS NORMAIS ==========
+    -- Parse IDs atuais
+    local weaponIDs = parseWeaponIDs()
     local mode = modos[storage.weaponModeIndex]
 
+    -- ========= PRIORIDADE: TRAINER =========
+    if target:getName():lower() == "trainer" then
+        local trainerID = weaponIDs.Trainer[1]
+        if currentWeapon ~= trainerID then
+            equiparAteFuncionar(trainerID, SlotLeft)
+        end
+        return
+    end
+
+    -- ========= MODOS NORMAIS =========
     if mode == "PvP" then
-        if distance > 1 and currentWeapon ~= 13614 then
-            equiparAteFuncionar(13614, SlotLeft)
-        elseif distance <= 1 and currentWeapon ~= 14253 then
-            equiparAteFuncionar(14253, SlotLeft)
+        local rangeID = weaponIDs.PvP[1]
+        local meleeID = weaponIDs.PvP[2]
+
+        if distance > 1 then
+            if currentWeapon ~= rangeID then equiparAteFuncionar(rangeID, SlotLeft) end
+        else
+            if currentWeapon ~= meleeID then equiparAteFuncionar(meleeID, SlotLeft) end
         end
 
     elseif mode == "Boss" then
-        local idPrincipal = 13614
-        local idSecundaria = 14579
+        local idPrincipal = weaponIDs.Boss[1]
+        local idSecundaria = weaponIDs.Boss[2]
 
         if lastAttackTime == 0 then
             lastAttackTime = currentTime
@@ -637,12 +679,11 @@ local trocarArmaMacro = macro(100, "Trocar Arma", function()
     end
 end)
 
--- Ícone simples para ativar/desativar o macro "Trocar Arma"
+-- ==================== ÍCONE ====================
+
 armaIcon = addIcon("Trocar Arma", {item = 11927, text = "Trocar Arma", hotkey = ""}, trocarArmaMacro)
 armaIcon:breakAnchors()
 armaIcon:move(290, 240)
-
-
 
 
 
