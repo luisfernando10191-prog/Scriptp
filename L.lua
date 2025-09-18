@@ -1,4 +1,3 @@
--- ================= UI Setup ================== 
 setDefaultTab('dgs')
 
 local dungeonOptions = {    
@@ -31,16 +30,15 @@ Panel
   Panel    
     id: checkboxPanel    
     layout:    
-      type: verticalBox    
+      type: verticalBox      
     anchors.top: toggleButton.bottom    
     anchors.left: parent.left    
     anchors.right: parent.right    
     height: 0    
     visible: false    
-]])    
+]])
 
 local checkboxesCreated = false    
-
 dungeonSetupPanel.toggleButton.onClick = function()    
   local checkboxPanel = dungeonSetupPanel.checkboxPanel    
   local show = not checkboxPanel:isVisible()    
@@ -67,203 +65,247 @@ dungeonSetupPanel.toggleButton.onClick = function()
     dungeonSetupPanel:setHeight(#dungeonOptions * 20 + 40)    
   else    
     checkboxPanel:setHeight(0)    
-    dungeonSetupPanel:setHeight(30)    
+    dungeonSetupPanel:setHeight(40)    
   end    
 end    
 
--- ========================
--- Efeito RGB no botão Dgs
--- ========================
-local btn = dungeonSetupPanel.toggleButton
-macro(1000, function()
-  if not btn then return end
-  btn:setColor("pink")
-  schedule(200, function() if btn then btn:setColor("red") end end)
-  schedule(400, function() if btn then btn:setColor("yellow") end end)
-  schedule(600, function() if btn then btn:setColor("orange") end end)
-  schedule(800, function() if btn then btn:setColor("#00FFFF") end end)
-  schedule(1000, function() if btn then btn:setColor("green") end end)
-  schedule(1200, function() if btn then btn:setColor("blue") end end)
-end)
+local configPanelMain = setupUI([[
+Panel
+  id: configPanelMain
+  height: 15
+  width: 140
+  margin: 5    
+  padding: 3   
+  anchors.top: dungeonSetupPanel.bottom
+  anchors.left: parent.left
 
+  Button
+    id: configButton
+    text: Configs
+    color: green
+    width: 60
+    height: 20
+    anchors.left: parent.left      
+    anchors.top: parent.top
 
--- ================ Lógica das Dungeons ================    
+  Panel
+    id: configPanel
+    layout:
+      type: verticalBox
+    anchors.top: configButton.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 0
+    visible: false
+]])
 
-local dungeonLabels = {    
-  { name = "Mudoku", label = "startMudoku", endLabel = "endMudoku" },    
-  { name = "Special Anko", label = "startAnko", endLabel = "endAnko" },    
-  { name = "Solo Black Wolf", label = "startSoloWolf", endLabel = "endSoloWolf" },    
-  { name = "Black Lobisomem", label = "startBlackLobisomem", endLabel = "endBlackLobisomem" },    
-  { name = "Special Chisana", label = "startChisana", endLabel = "endChisana" },    
-  { name = "Dungeon Farukon", label = "startDungeonFarukon", endLabel = "endDungeonFarukon" },    
-  { name = "Solo Lobisomem", label = "startSoloLobisomem", endLabel = "endLobisomem" },    
-  { name = "Special Haku", label = "startSpecialHaku", endLabel = "endSpecialHaku" },    
-  { name = "Dungeon Shita", label = "startDungeonShita", endLabel = "endDungeonShita" },    
-  { name = "Elite Black Dragon", label = "startEliteBlackDragon", endLabel = "endEliteBlackDragon" },    
-  { name = "Madara Rikudou", label = "startMadaraRikudou", endLabel = "endMadaraRikudou" },    
-  { name = "Special Minato", label = "startSpecialMinato", endLabel = "endSpecialMinato" },    
-  { name = "Special Itachi", label = "startItachi", endLabel = "endItachi" },    
-  { name = "Special Obito", label = "startSpecialObito", endLabel = "endSpecialObito" },    
-  { name = "Special Hagoromo", label = "startHagoromo", endLabel = "endHagoromo" },    
-  { name = "Majo Tsuyoi", label = "startMajoTsuyoi", endLabel = "endMajoTsuyoi" },    
-    { name = "Dungeon Kakuzu", label = "startKakuzu", endLabel = "endKakuzu" },    
-  { name = "Naruto Barion", label = "startNarutoBarion", endLabel = "endNarutoBarion" }    
-}    
+local configsCreated = false
+configPanelMain.configButton.onClick = function()
+  local configPanel = configPanelMain.configPanel
+  local show = not configPanel:isVisible()
 
-local bossNames = {    
-  "Mudoku", "Special Anko", "Special Itachi", "Black Lobisomem", "Special Chisana",    
-  "Elite Black Dragon", "Special Haku", "Dungeon Fuuton Heart", "Solo Black Wolf", "Solo Lobisomem", "Madara Rikudou",    
-  "Special Minato", "Special Obito", "Majo Tsuyoi", "Dungeon Shita",    
-  "Dungeon Farukon", "Naruto Barion", "Special Hagoromo"    
-}    
-
-local checkInterval = 30000    
-local maxWaitTime = 15000    
-local currentDungeon = nil    
-local tryingToEnterSince = nil    
-local dungeonIndex = 1    
-
--- ================= Controle do Treino =================
-local treinoSquares = {
-  {x = 1449, y = 1220, z = 8},
-  {x = 1449, y = 1222, z = 8},
-  {x = 1449, y = 1224, z = 8},
-  {x = 1449, y = 1226, z = 8},
-  {x = 1449, y = 1228, z = 8},
-  {x = 1449, y = 1230, z = 8},
-  {x = 1449, y = 1232, z = 8}, 
-  {x = 1449, y = 1234, z = 8},
-  {x = 1449, y = 1236, z = 8},
-  {x = 1449, y = 1238, z = 8},
-  -- adicione quantos sqms quiser
-}
-
-local estavaNoTreino = nil            -- estado anterior
-local suppressExitOff = false         -- suprime o desligamento ao SAIR do treino quando for pra dungeon
-
--- Função para verificar se está em algum sqm de treino
-local function estaNoTreino(p)
-  for _, sq in ipairs(treinoSquares) do
-    if p.x == sq.x and p.y == sq.y and p.z == sq.z then
-      return true
+  if show and not configsCreated then
+    local treinoCheckbox = g_ui.createWidget("CheckBox", configPanel)
+    treinoCheckbox:setId("treinoCheckbox")
+    treinoCheckbox:setText("Ativar Treino")
+    treinoCheckbox:setWidth(140)
+    treinoCheckbox:setChecked(storage.treinoAtivo or false)
+    treinoCheckbox.onCheckChange = function(widget, value)
+      storage.treinoAtivo = value
     end
+
+    configsCreated = true
   end
-  return false
+
+  configPanel:setVisible(show)
+  if show then
+    configPanel:setHeight(20)
+    configPanelMain:setHeight(configPanelMain:getHeight() + 30)
+  else
+    configPanel:setHeight(0)
+    configPanelMain:setHeight(configPanelMain:getHeight() - 30)
+  end
 end
 
--- Detecta boss com vida baixa 
-macro(500, function()    
-  for _, val in pairs(getSpectators()) do    
-    if val:isMonster() then    
-      local name = val:getName():lower()    
-      for _, boss in ipairs(bossNames) do    
-        if name:find(boss:lower()) and val:getHealthPercent() <= 95 then    
-          CaveBot.setOn(false)    
-          currentDungeon = nil    
-          tryingToEnterSince = nil    
-          return    
-        end    
-      end    
-    end    
-  end    
-end)    
+configPanelMain.configButton.onClick()
 
+local function applyRGB(btn)
+  macro(1000, function()  
+    if not btn then return end  
+    btn:setColor("pink")  
+    schedule(200, function() if btn then btn:setColor("red") end end)  
+    schedule(400, function() if btn then btn:setColor("yellow") end end)  
+    schedule(600, function() if btn then btn:setColor("orange") end end)  
+    schedule(800, function() if btn then btn:setColor("#00FFFF") end end)  
+    schedule(1000, function() if btn then btn:setColor("green") end end)  
+    schedule(1200, function() if btn then btn:setColor("blue") end end)  
+  end)
+end
 
--- Desliga ao entrar/sair do sqm de treino, com exceção da saída para dungeon
+applyRGB(dungeonSetupPanel.toggleButton)
+applyRGB(configPanelMain.configButton)
 
-macro(200, function()
-  local p = pos()
-  if not p then return end
-  local noTreino = estaNoTreino(p)
+local dungeonLabels = {      
+  { name = "Mudoku", label = "startMudoku", endLabel = "endMudoku" },      
+  { name = "Special Anko", label = "startAnko", endLabel = "endAnko" },      
+  { name = "Solo Black Wolf", label = "startSoloWolf", endLabel = "endSoloWolf" },      
+  { name = "Black Lobisomem", label = "startBlackLobisomem", endLabel = "endBlackLobisomem" },      
+  { name = "Special Chisana", label = "startChisana", endLabel = "endChisana" },      
+  { name = "Dungeon Farukon", label = "startDungeonFarukon", endLabel = "endDungeonFarukon" },      
+  { name = "Solo Lobisomem", label = "startSoloLobisomem", endLabel = "endLobisomem" },      
+  { name = "Special Haku", label = "startSpecialHaku", endLabel = "endSpecialHaku" },      
+  { name = "Dungeon Shita", label = "startDungeonShita", endLabel = "endDungeonShita" },      
+  { name = "Elite Black Dragon", label = "startEliteBlackDragon", endLabel = "endEliteBlackDragon" },      
+  { name = "Madara Rikudou", label = "startMadaraRikudou", endLabel = "endMadaraRikudou" },      
+  { name = "Special Minato", label = "startSpecialMinato", endLabel = "endSpecialMinato" },      
+  { name = "Special Itachi", label = "startItachi", endLabel = "endItachi" },      
+  { name = "Special Obito", label = "startSpecialObito", endLabel = "endSpecialObito" },      
+  { name = "Special Hagoromo", label = "startHagoromo", endLabel = "endHagoromo" },      
+  { name = "Majo Tsuyoi", label = "startMajoTsuyoi", endLabel = "endMajoTsuyoi" },      
+  { name = "Dungeon Kakuzu", label = "startKakuzu", endLabel = "endKakuzu" },      
+  { name = "Naruto Barion", label = "startNarutoBarion", endLabel = "endNarutoBarion" }      
+}      
 
-  if estavaNoTreino == nil then
-    estavaNoTreino = noTreino
-    return
-  end
+local bossNames = {      
+  "Mudoku", "Special Anko", "Special Itachi", "Black Lobisomem", "Special Chisana",      
+  "Elite Black Dragon", "Special Haku", "Dungeon Fuuton Heart", "Solo Black Wolf", "Solo Lobisomem", "Madara Rikudou",      
+  "Special Minato", "Special Obito", "Majo Tsuyoi", "Dungeon Shita",      
+  "Dungeon Farukon", "Naruto Barion", "Special Hagoromo"      
+}      
 
-  -- Entrou no sqm do treino
-  if not estavaNoTreino and noTreino then
-    CaveBot.setOn(false)
-  -- Saiu do sqm do treino
-  elseif estavaNoTreino and not noTreino then
-    if suppressExitOff then
-      -- consumimos a exceção somente uma vez
-      suppressExitOff = false
-    else
-      CaveBot.setOn(false)
-    end
-  end
+local checkInterval = 30000      
+local maxWaitTime = 15000      
+local currentDungeon = nil      
+local tryingToEnterSince = nil      
+local dungeonIndex = 1      
 
-  estavaNoTreino = noTreino
+local treinoSquares = {  
+  {x = 1449, y = 1220, z = 8},  
+  {x = 1449, y = 1222, z = 8},  
+  {x = 1449, y = 1224, z = 8},  
+  {x = 1449, y = 1226, z = 8},  
+  {x = 1449, y = 1228, z = 8},  
+  {x = 1449, y = 1230, z = 8},  
+  {x = 1449, y = 1232, z = 8},   
+  {x = 1449, y = 1234, z = 8},  
+  {x = 1449, y = 1236, z = 8},  
+  {x = 1449, y = 1238, z = 8},  
+}  
+
+local estavaNoTreino = nil              
+local suppressExitOff = false           
+
+local function estaNoTreino(p)  
+  for _, sq in ipairs(treinoSquares) do  
+    if p.x == sq.x and p.y == sq.y and p.z == sq.z then  
+      return true  
+    end  
+  end  
+  return false  
+end  
+
+macro(500, function()      
+  for _, val in pairs(getSpectators()) do      
+    if val:isMonster() then      
+      local name = val:getName():lower()      
+      for _, boss in ipairs(bossNames) do      
+        if name:find(boss:lower()) and val:getHealthPercent() <= 95 then      
+          CaveBot.setOn(false)      
+          currentDungeon = nil      
+          tryingToEnterSince = nil      
+          return      
+        end      
+      end      
+    end      
+  end      
+end)      
+
+macro(200, function()  
+  local p = pos()  
+  if not p then return end  
+  local noTreino = estaNoTreino(p)  
+
+  if estavaNoTreino == nil then  
+    estavaNoTreino = noTreino  
+    return  
+  end  
+
+  if not estavaNoTreino and noTreino then  
+    CaveBot.setOn(false)  
+  elseif estavaNoTreino and not noTreino then  
+    if suppressExitOff then  
+      suppressExitOff = false  
+    else  
+      CaveBot.setOn(false)  
+    end  
+  end  
+
+  estavaNoTreino = noTreino  
 end)
 
--- Macro principal das dungeons
-macro(checkInterval, "Auto Dungeon", function()
-  local now = os.clock() * 1000
+macro(checkInterval, "Auto Dungeon", function()  
+  local now = os.clock() * 1000  
 
-  if currentDungeon and tryingToEnterSince and (now - tryingToEnterSince > maxWaitTime) then    
-    CaveBot.gotoLabel(currentDungeon.label)    
-    tryingToEnterSince = now    
-    return    
-  end    
+  if currentDungeon and tryingToEnterSince and (now - tryingToEnterSince > maxWaitTime) then      
+    CaveBot.gotoLabel(currentDungeon.label)      
+    tryingToEnterSince = now      
+    return      
+  end      
 
-  if currentDungeon then return end    
+  if currentDungeon then return end      
 
-  local attempts = 0    
-  while attempts < #dungeonLabels do    
-    local dungeon = dungeonLabels[dungeonIndex]    
-    local enabled = storage["dungeon_" .. dungeon.name] or false    
+  local attempts = 0      
+  while attempts < #dungeonLabels do      
+    local dungeon = dungeonLabels[dungeonIndex]      
+    local enabled = storage["dungeon_" .. dungeon.name] or false      
 
-    if enabled then    
-      local isAvailable = false    
+    if enabled then      
+      local isAvailable = false      
 
-      for _, child in pairs(g_ui.getRootWidget():recursiveGetChildren()) do    
-        if type(child.getText) == "function" and child:isVisible() then    
-          local text = child:getText()    
-          if text and text:find(dungeon.name) then    
-            local parent = child:getParent()    
-            if parent then    
-              for _, label in pairs(parent:getChildren()) do    
-                if type(label.getText) == "function" and label:isVisible() and label:getText() == "OK" then    
-                  isAvailable = true    
-                  break    
-                end    
-              end    
-            end    
-          end    
-        end    
-        if isAvailable then break end    
-      end    
+      for _, child in pairs(g_ui.getRootWidget():recursiveGetChildren()) do      
+        if type(child.getText) == "function" and child:isVisible() then      
+          local text = child:getText()      
+          if text and text:find(dungeon.name) then      
+            local parent = child:getParent()      
+            if parent then      
+              for _, label in pairs(parent:getChildren()) do      
+                if type(label.getText) == "function" and label:isVisible() and label:getText() == "OK" then      
+                  isAvailable = true      
+                  break      
+                end      
+              end      
+            end      
+          end      
+        end      
+        if isAvailable then break end      
+      end      
 
-      if isAvailable then    
-        -- Se estiver em algum sqm do treino, não desligar ao sair agora (vamos pra dungeon)
-        local p = pos()
-        if p and estaNoTreino(p) then
-          suppressExitOff = true
-        end
+      if isAvailable then      
+        local p = pos()  
+        if p and estaNoTreino(p) then  
+          suppressExitOff = true  
+        end  
 
-        CaveBot.setOn(true)    
-        CaveBot.gotoLabel(dungeon.label)    
-        currentDungeon = dungeon    
-        tryingToEnterSince = now    
-        return    
-      end    
-    end    
+        CaveBot.setOn(true)      
+        CaveBot.gotoLabel(dungeon.label)      
+        currentDungeon = dungeon      
+        tryingToEnterSince = now      
+        return      
+      end      
+    end      
 
-    dungeonIndex = dungeonIndex + 1    
-    if dungeonIndex > #dungeonLabels then dungeonIndex = 1 end    
-    attempts = attempts + 1    
-  end    
+    dungeonIndex = dungeonIndex + 1      
+    if dungeonIndex > #dungeonLabels then dungeonIndex = 1 end      
+    attempts = attempts + 1      
+  end      
 
-  -- Nenhuma dungeon disponível → vai para treino (se não estiver lá)
-  local p = pos()
-  local noTreino = (p and estaNoTreino(p)) or false
-  if not noTreino then
-    CaveBot.setOn(true)
-    CaveBot.gotoLabel("startTreino")
-  end
+  local p = pos()  
+  local noTreino = (p and estaNoTreino(p)) or false  
+  if not noTreino and (storage.treinoAtivo or false) then  
+    CaveBot.setOn(true)  
+    CaveBot.gotoLabel("startTreino")  
+  end  
 end)
-
 
 -- Voltar do hospital
 macro(10000, function()
