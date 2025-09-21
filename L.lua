@@ -39,11 +39,11 @@ Panel
 ]])
 
 local checkboxesCreated = false    
-dungeonSetupPanel.toggleButton.onClick = function()    
-  local checkboxPanel = dungeonSetupPanel.checkboxPanel    
-  local show = not checkboxPanel:isVisible()    
 
-  if show and not checkboxesCreated then    
+-- Função para criar checkboxes
+local function createDungeonCheckboxes()
+  local checkboxPanel = dungeonSetupPanel.checkboxPanel
+  if not checkboxesCreated then    
     for _, name in ipairs(dungeonOptions) do    
       local id = name:gsub("%s+", "")    
       local checkbox = g_ui.createWidget("CheckBox", checkboxPanel)    
@@ -57,8 +57,19 @@ dungeonSetupPanel.toggleButton.onClick = function()
       end    
     end    
     checkboxesCreated = true    
-  end    
+  end
+end
 
+-- Cria checkboxes e abre o painel automaticamente
+createDungeonCheckboxes()
+local checkboxPanel = dungeonSetupPanel.checkboxPanel
+checkboxPanel:setVisible(true)
+checkboxPanel:setHeight(#dungeonOptions * 20)
+dungeonSetupPanel:setHeight(#dungeonOptions * 20 + 40)
+
+-- Mantém funcionalidade do toggle button
+dungeonSetupPanel.toggleButton.onClick = function()    
+  local show = not checkboxPanel:isVisible()    
   checkboxPanel:setVisible(show)    
   if show then    
     checkboxPanel:setHeight(#dungeonOptions * 20)    
@@ -69,6 +80,7 @@ dungeonSetupPanel.toggleButton.onClick = function()
   end    
 end    
 
+-- Config Panel
 local configPanelMain = setupUI([[
 Panel
   id: configPanelMain
@@ -129,6 +141,7 @@ end
 
 configPanelMain.configButton.onClick()
 
+-- Efeito RGB nos botões
 local function applyRGB(btn)
   macro(1000, function()  
     if not btn then return end  
@@ -145,6 +158,7 @@ end
 applyRGB(dungeonSetupPanel.toggleButton)
 applyRGB(configPanelMain.configButton)
 
+-- Dungeon Labels
 local dungeonLabels = {      
   { name = "Mudoku", label = "startMudoku", endLabel = "endMudoku" },      
   { name = "Special Anko", label = "startAnko", endLabel = "endAnko" },      
@@ -166,6 +180,7 @@ local dungeonLabels = {
   { name = "Naruto Barion", label = "startNarutoBarion", endLabel = "endNarutoBarion" }      
 }      
 
+-- Bosses
 local bossNames = {      
   "Mudoku", "Special Anko", "Special Itachi", "Black Lobisomem", "Special Chisana",      
   "Elite Black Dragon", "Special Haku", "Dungeon Fuuton Heart", "Solo Black Wolf", "Solo Lobisomem", "Madara Rikudou",      
@@ -173,6 +188,7 @@ local bossNames = {
   "Dungeon Farukon", "Naruto Barion", "Special Hagoromo"      
 }      
 
+-- Configs de macros
 local checkInterval = 30000      
 local maxWaitTime = 15000      
 local currentDungeon = nil      
