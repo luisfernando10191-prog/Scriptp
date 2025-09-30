@@ -14,15 +14,16 @@ local perdaDanzo = "%[80%%%] da sua vida%."
 local perdaIzanagi = "%[30%%%] da sua vida%."      
 local skipTrigger = "Use o jutsu SKIP para subir"      
       
--- INICIALIZAÇÕES      
+INICIALIZAÇÕES      
 now = now or g_clock.millis()      
 if type(storage.cd) ~= "table" then storage.cd = {} end      
 if not storage.cd.danzo then storage.cd.danzo = 0 end      
 if not storage.cd.izanagi then storage.cd.izanagi = 0 end      
 storage.modoForca = storage.modoForca or false    
     
--- PAINEL OTUI COMPLETO COM POSICIONAMENTO VIA MARGEM    
-local painel = setupUI([[      
+PAINEL OTUI COMPLETO COM POSICIONAMENTO VIA MARGEM    
+l
+ocal painel = setupUI([[      
 Panel      
   id: painelPassivas    
   height: 80      
