@@ -1033,7 +1033,7 @@ end)
 -- Macro de ataque apenas para Trainer
 local trainerName = "Trainer" -- nome exato do monstro
 
-trainerMacro = macro(1, "Treiner" function()
+trainerMacro = macro(1, "Atacar Treiner", function()
   if isInPz() then
     return
   end
