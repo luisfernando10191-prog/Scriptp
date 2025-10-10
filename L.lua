@@ -4,7 +4,7 @@ local dungeonOptions = {
   "Mudoku", "Special Anko", "Solo Black Wolf", "Black Lobisomem",    
   "Special Chisana", "Dungeon Farukon", "Dungeon Kakuzu", "Solo Lobisomem", "Special Haku",    
   "Dungeon Shita", "Elite Black Dragon", "Madara Rikudou", "Special Minato",    
-  "Special Itachi", "Special Obito", "Special Hagoromo", "Naruto Barion", "Majo Tsuyoi"    
+  "Special Itachi", "Special Obito", "Special Hagoromo", "Naruto Barion", "Special Tsunade", "Majo Tsuyoi"    
 }    
 
 local dungeonSetupPanel = setupUI([[    
@@ -176,6 +176,7 @@ local dungeonLabels = {
   { name = "Special Obito", label = "startSpecialObito", endLabel = "endSpecialObito" },      
   { name = "Special Hagoromo", label = "startHagoromo", endLabel = "endHagoromo" },      
   { name = "Majo Tsuyoi", label = "startMajoTsuyoi", endLabel = "endMajoTsuyoi" },      
+  { name = "Special Tsunade", label = "startTsunade", endLabel = "endTsunade" },      
   { name = "Dungeon Kakuzu", label = "startKakuzu", endLabel = "endKakuzu" },      
   { name = "Naruto Barion", label = "startNarutoBarion", endLabel = "endNarutoBarion" }      
 }      
@@ -185,7 +186,7 @@ local bossNames = {
   "Mudoku", "Special Anko", "Special Itachi", "Black Lobisomem", "Special Chisana",      
   "Elite Black Dragon", "Special Haku", "Dungeon Fuuton Heart", "Solo Black Wolf", "Solo Lobisomem", "Madara Rikudou",      
   "Special Minato", "Special Obito", "Majo Tsuyoi", "Dungeon Shita",      
-  "Dungeon Farukon", "Naruto Barion", "Special Hagoromo"      
+  "Dungeon Farukon", "Naruto Barion", "Special Tsunade", "Special Hagoromo"      
 }      
 
 -- Configs de macros
